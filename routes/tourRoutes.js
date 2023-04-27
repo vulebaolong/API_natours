@@ -1,8 +1,22 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
+// const reviewController = require('./../controllers//reviewController');
+const reviewRouters = require('./../routes/reviewRouters');
 
 const router = express.Router();
+
+// POST /tour/234fa12/reviews
+// GET /tour/234fa12/reviews
+// GET /tour/234fa12/reviews/9694kt1
+// router
+//   .route('/:tourId/reviews')
+//   .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewController.createReview
+//   );
+router.use('/:tourId/reviews', reviewRouters);
 
 router
   .route('/topTours')

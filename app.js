@@ -15,6 +15,7 @@ const AppError = require('./utils/apiError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRouters');
 
 const app = express();
 
@@ -76,6 +77,7 @@ app.use((req, res, next) => {
 // 3) ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //4) xử lý các URL người dùng sử dụng không đúng
 app.all('*', (req, res, next) => {

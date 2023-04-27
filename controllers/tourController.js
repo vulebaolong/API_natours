@@ -1,7 +1,7 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
 const { catchAsync } = require('./../utils/catchAsync');
 const AppError = require('./../utils/apiError');
+const factory = require('./handleFactory');
 
 // tạo ra 1 middle ở giữa để thiết lập các option cho đường dẫn
 // tourController.aliasTopTour
@@ -16,96 +16,6 @@ exports.aliasTopTour = (req, res, next) => {
   req.query.fields = 'name ratingsAverage price';
   next();
 };
-
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  console.log('req.query: ', req.query);
-  // BUILD QUERY
-  // const queryObj = JSON.parse(JSON.stringify(req.query));
-
-  const features = new APIFeatures(req.query, Tour.find())
-    .fillter()
-    .sort()
-    .fields()
-    .panigation();
-
-  const tours = await features.query;
-
-  // SEND REPONSE
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-
-  if (!tour) {
-    next(new AppError(`Không có tour nào với id: ${req.params.id}`, 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  // GỬI LÊN BODY VÀ CHO BODY VÀO CREATE
-  const newTour = await Tour.create(req.body);
-  console.log(newTour);
-  // if (!newTour) {
-  //   next(new AppError(`Tạo new Tour thất bại`, 404));
-  //   return;
-  // }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-
-  if (!tour) {
-    next(new AppError(`Không có tour nào với id: ${req.params.id}`, 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour) {
-    next(new AppError(`Không có tour nào với id: ${req.params.id}`, 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: null
-  });
-});
 
 exports.getToursStart = catchAsync(async (req, res, next) => {
   const start = await Tour.aggregate([
@@ -138,3 +48,9 @@ exports.getToursStart = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);

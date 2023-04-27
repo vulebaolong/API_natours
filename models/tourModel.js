@@ -1,7 +1,8 @@
+// const { referrerPolicy } = require('helmet');
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const User = require('./userModel');
+// const User = require('./userModel');
 
 //TẠO LƯỢC ĐỒ
 const tourSchema = new mongoose.Schema(
@@ -111,7 +112,13 @@ const tourSchema = new mongoose.Schema(
         day: Number
       }
     ],
-    guides: Array
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        // chỉ chứa các ID có thể tham chiếu
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -126,6 +133,13 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  // tên của trường trong mô hình khác là ref: 'Review'
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 //MIDDLEWARE: runs before .save() and .create()
 //nếu dùng .insertMany sẽ không chạy middleware, bắt buộc phải có .save() and .create()
 tourSchema.pre('save', function(next) {
@@ -134,16 +148,26 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
-tourSchema.pre('save', async function(next) {
-  // hàm map không phải là promises, nhưng hàm bên trong là promises
-  // nên hàm map sẽ trả về là promises nên biến guidesPromises chỉ chứa toàn promises
-  const guidesPromises = this.guides.map(async id => {
-    return await User.findById(id);
+// tourSchema.pre('save', async function(next) {
+//   // hàm map không phải là promises, nhưng hàm bên trong là promises
+//   // nên hàm map sẽ trả về là promises nên biến guidesPromises chỉ chứa toàn promises
+//   const guidesPromises = this.guides.map(async id => {
+//     return await User.findById(id);
+//   });
+
+//   // dùng hàm Promise.all để đợi tất cả promises được trả về hết
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
+
+// truy vấn đề key guides để lấy ra các thông tin của id đã có trong guides
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    //trường select loại bỏ những key không muốn hiển thị cho user trong key guides
+    select: '-__v -passwordChangedAt'
   });
-
-  // dùng hàm Promise.all để đợi tất cả promises được trả về hết
-  this.guides = await Promise.all(guidesPromises);
-
   next();
 });
 
