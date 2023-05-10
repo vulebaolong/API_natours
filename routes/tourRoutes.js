@@ -22,20 +22,37 @@ router
   .route('/topTours')
   // tourController.aliasTopTour đây là middle ở giữa để thiết lập các option cho đường dẫn
   // tourController.aliasTopTour có chạy hàm next() để chạy tiếp tục tourController.getAllTours
-  .get(tourController.aliasTopTour, tourController.getAllTours);
+  .get(
+    authController.protect,
+    tourController.aliasTopTour,
+    tourController.getAllTours
+  );
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+// tours-within/233/center/-40,50/unit/mi
 
 // router.param('id', tourController.checkID);
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTour);
+  .get(tourController.getAllTours)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.createTour
+  );
 
 router.route('/tours-start').get(tourController.getToursStart);
 
 router
   .route('/:id')
   .get(tourController.getTour)
-  .patch(tourController.updateTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.updateTour
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

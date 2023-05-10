@@ -87,6 +87,7 @@ exports.getAll = Model => {
       .fields()
       .panigation();
 
+    // const doc = await features.query.explain();
     const doc = await features.query;
 
     // SEND REPONSE

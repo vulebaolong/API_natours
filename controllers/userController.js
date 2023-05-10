@@ -14,12 +14,6 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -27,6 +21,10 @@ exports.createUser = (req, res) => {
   });
 };
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Tạo lỗi nếu người dùng cập nhật mật khẩu
   if (req.body.password || req.body.passwordConfirm) {

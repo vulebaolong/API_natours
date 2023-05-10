@@ -4,26 +4,25 @@ const authController = require('./../controllers/authController');
 
 const router = express.Router();
 
+// không cần đăng nhập
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updatePassword',
-  authController.protect,
-  authController.updatePassword
-);
+//! những dòng mã chạy sau sẽ đều có protect, vì chạy theo thứ tự
+router.use(authController.protect);
+router.patch('/updatePassword', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
 
-router.patch('/updateMe', authController.protect, userController.updateMe);
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
-
+//! những dòng mã chạy sau sẽ đều có protect và phải có quyền admin
+router.use(authController.restrictTo('admin'));
 router
   .route('/')
   .get(userController.getAllUsers)
   .post(userController.createUser);
-
 router
   .route('/:id')
   .get(userController.getUser)
