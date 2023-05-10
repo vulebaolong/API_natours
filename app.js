@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 // giới hạn sử dụng API
@@ -19,7 +20,15 @@ const reviewRouter = require('./routes/reviewRouters');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // 1) GLOBAL MIDDLEWARES
+
+// serving static file
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
+
 // bảo vệ HTTTP headers phải nên đặt ở đầu tiên
 app.use(helmet());
 
@@ -60,9 +69,6 @@ app.use(
   })
 );
 
-// serving static file
-app.use(express.static(`${__dirname}/public`));
-
 // test
 app.use((req, res, next) => {
   console.log('Hello from the middleware 👋');
@@ -75,6 +81,10 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+app.get('/', (req, res) => {
+  res.status(200).render('base');
+});
+
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
