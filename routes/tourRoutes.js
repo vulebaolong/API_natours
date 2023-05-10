@@ -28,10 +28,12 @@ router
     tourController.getAllTours
   );
 
+// tours-within/233/center/-40,50/unit/mi
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(tourController.getToursWithin);
-// tours-within/233/center/-40,50/unit/mi
+
+router.route('/distences/:latlng/unit/:unit').get(tourController.getDistances);
 
 // router.param('id', tourController.checkID);
 router
