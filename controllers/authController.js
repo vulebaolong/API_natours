@@ -123,6 +123,40 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+// chỉ với các trang render, không có lỗi
+// hàm này chủ yếu trải qua các kiểm tra và cuối cùng là đưa currentUser vào templates
+// res.locals.user = currentUser;
+// nếu như không trả qua được sẽ không đưa currentUser vào templates và next()
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // xác thực token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    // 3) kiểm tra người dùng có tồn tại hay không
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      next();
+      return;
+    }
+
+    // 4) nếu người dùng đã thay đổi mật khẩu sau JWT (jsonwebtoken) được tạo
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      next();
+      return;
+    }
+
+    // Người dùng đã đăng nhập
+    res.locals.user = currentUser;
+    console.log(res.locals.user);
+    next();
+    return;
+  }
+  next();
+});
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ['admin', 'lead-guide']
