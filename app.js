@@ -11,6 +11,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 // chống lặp lại các param vì nếu trùng sẽ không chạy được
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/apiError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -49,6 +50,7 @@ app.use('/api', limiter);
 // phân tính cú pháp body, đọc dữ liệu từ req.body
 // nếu body lớn hơn 10kb sẽ bị từ chối
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // làm sạch dữ liệu, và chống lại NOSQL query injection
 app.use(mongoSanitize());
@@ -78,7 +80,7 @@ app.use((req, res, next) => {
 });
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.headers.authorization);
+  console.log(req.cookies);
   next();
 });
 
