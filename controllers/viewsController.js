@@ -19,7 +19,7 @@ exports.getTour = catchAsync(async (req, res) => {
   });
   console.log(tour);
   res.status(200).render('tour', {
-    title: 'một tour',
+    title: `${tour.name} Tour`,
     tour
   });
 });
