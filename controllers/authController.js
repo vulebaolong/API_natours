@@ -17,6 +17,7 @@ const createSendToken = (user, statusCode, res) => {
   const cookieOption = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      // Date.now() + 2000
     ),
     // secure cookie sẽ chỉ được gửi trên một kết nối mã hóa https
     // secure: true,
@@ -77,6 +78,14 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+exports.logout = function(req, res, next) {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now()),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) nhận được mã token từ clien gửi lên, nếu không tồn tại trả về lỗi chưa đăng nhập
   console.log(req.headers.authorization);
@@ -127,35 +136,40 @@ exports.protect = catchAsync(async (req, res, next) => {
 // hàm này chủ yếu trải qua các kiểm tra và cuối cùng là đưa currentUser vào templates
 // res.locals.user = currentUser;
 // nếu như không trả qua được sẽ không đưa currentUser vào templates và next()
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
-    // xác thực token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+    try {
+      // xác thực token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // 3) kiểm tra người dùng có tồn tại hay không
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
+      // 3) kiểm tra người dùng có tồn tại hay không
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        next();
+        return;
+      }
+
+      // 4) nếu người dùng đã thay đổi mật khẩu sau JWT (jsonwebtoken) được tạo
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        next();
+        return;
+      }
+
+      // Người dùng đã đăng nhập
+      res.locals.user = currentUser;
+      console.log(res.locals.user);
+      next();
+      return;
+    } catch (error) {
       next();
       return;
     }
-
-    // 4) nếu người dùng đã thay đổi mật khẩu sau JWT (jsonwebtoken) được tạo
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      next();
-      return;
-    }
-
-    // Người dùng đã đăng nhập
-    res.locals.user = currentUser;
-    console.log(res.locals.user);
-    next();
-    return;
   }
   next();
-});
+};
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
