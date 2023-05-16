@@ -1,6 +1,8 @@
 /* eslint-disable */
+import axios from 'axios';
+import { showAlert, hideAlert } from './alerts';
 
-async function login(email, password) {
+export async function login(email, password) {
   try {
     console.log(email, password);
     const result = await axios({
@@ -12,17 +14,14 @@ async function login(email, password) {
       }
     });
     if (result.data.status === 'success') {
-      location.assign('/');
+      showAlert('success', 'Đăng nhập thành công');
+      window.setTimeout(function() {
+        location.assign('/');
+      }, 1500);
     }
     console.log(result);
   } catch (error) {
+    showAlert('error', error.response.data.message);
     console.log('👙  error: ', error);
   }
 }
-
-document.querySelector('.form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const email = document.querySelector('#email').value;
-  const password = document.querySelector('#password').value;
-  login(email, password);
-});
