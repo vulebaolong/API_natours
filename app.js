@@ -50,6 +50,7 @@ app.use('/api', limiter);
 // phân tính cú pháp body, đọc dữ liệu từ req.body
 // nếu body lớn hơn 10kb sẽ bị từ chối
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // làm sạch dữ liệu, và chống lại NOSQL query injection
