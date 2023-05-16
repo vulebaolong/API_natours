@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const { catchAsync } = require('../utils/catchAsync');
+const AppError = require('../utils/apiError');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) get tour data từ collection
@@ -17,7 +18,9 @@ exports.getTour = catchAsync(async (req, res, next) => {
     path: 'reviews',
     fields: 'review rating user'
   });
-  console.log(tour);
+  if (!tour) {
+    return next(new AppError('Không tìm thấy tour nào', 404));
+  }
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour

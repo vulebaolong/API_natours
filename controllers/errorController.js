@@ -32,36 +32,66 @@ const handleJWTExpiredError = err => {
   return new AppError(message, 401);
 };
 
-const sendErrorDev = (res, err) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: `errorControler.js / ${err.message}`,
-    stack: err.stack
-  });
-};
-const sendErrorProd = (res, err) => {
-  console.log(err);
-  console.log(err.isOperational);
-  //những lỗi tin tưởng để trả thông tin lỗi cho khách hàng
-  if (err.isOperational) {
-    // 2) gửi lỗi cho khách hàng
-    res.status(err.statusCode).json({
+const sendErrorDev = (res, req, err) => {
+  // a) API
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
       status: err.status,
       error: err,
-      message: `errorControler.js / ${err.message}`
+      message: `${err.message}`,
+      stack: err.stack
     });
-  } else {
-    //lỗi không xác định nên không muốn leak thông tin cho khách hàng
+  }
+
+  // b) RENDER WEBSITE
+  console.error('(lỗi chưa được xử lý) ERROR: ', err);
+  return res.status(err.statusCode).render('error', {
+    title: 'Something wrong',
+    msg: err.message
+  });
+};
+const sendErrorProd = (res, req, err) => {
+  // a) API
+  if (req.originalUrl.startsWith('/api')) {
+    // a) những lỗi ĐÃ XỬ LÝ để trả thông tin lỗi cho khách hàng
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        error: err,
+        message: `${err.message}`
+      });
+    }
+
+    // b) lỗi CHƯA ĐƯỢC XỬ LÝ nên không muốn leak thông tin cho khách hàng
     // 1) log lỗi
     console.error('(lỗi chưa được xử lý) ERROR: ', err);
 
-    res.status(500).json({
+    // 2) gửi lỗi cho khách
+    return res.status(500).json({
       status: 'error',
-      message: `Something wrong (lỗi chưa được xử lý)`,
-      error: err // không nên show error cho khách hàng hàng
+      message: `Something wrong (lỗi chưa được xử lý)`
+      // error: err // không nên show error cho khách hàng hàng
     });
   }
+
+  // b) RENDER WEBSITE
+  // những lỗi ĐÃ XỬ LÝ để trả thông tin lỗi cho khách hàng
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something wrong',
+      msg: err.message
+    });
+  }
+
+  // 1) log lỗi
+  // lỗi CHƯA ĐƯỢC XỬ LÝ nên không muốn leak thông tin cho khách hàng
+  console.error('(lỗi chưa được xử lý) ERROR: ', err);
+
+  // 2) gửi lỗi cho khách
+  return res.status(err.statusCode).render('error', {
+    title: 'Something wrong',
+    msg: 'xin vui lòng thử lại'
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -71,14 +101,11 @@ module.exports = (err, req, res, next) => {
 
   if (process.env.NODE_ENV === 'development') {
     console.log(err);
-    sendErrorDev(res, err);
+    sendErrorDev(res, req, err);
   }
 
   if (process.env.NODE_ENV === 'production') {
     // let errCoppy = JSON.parse(JSON.stringify(err));
-
-    console.log(err);
-    console.log(err.name);
     if (err.name === 'CastError') {
       console.log(err.name);
       err = handleCastErrorDB(err);
@@ -104,6 +131,6 @@ module.exports = (err, req, res, next) => {
       err = handleJWTExpiredError(err);
     }
 
-    sendErrorProd(res, err);
+    sendErrorProd(res, req, err);
   }
 };
