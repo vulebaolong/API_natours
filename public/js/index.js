@@ -8,7 +8,8 @@ import { updateSetting } from './updateSetting';
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const settingForm = document.querySelector('.form-user-data');
+const dataForm = document.querySelector('.form-user-data');
+const passwordForm = document.querySelector('.form-user-password');
 
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -31,12 +32,30 @@ if (logOutBtn) {
   });
 }
 
-if (settingForm) {
-  settingForm.addEventListener('submit', function(e) {
+if (dataForm) {
+  dataForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const name = document.querySelector('#name').value;
     const email = document.querySelector('#email').value;
 
-    updateSetting(name, email);
+    updateSetting({ name, email }, 'data');
+  });
+}
+
+if (passwordForm) {
+  passwordForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    document.querySelector('.btn--save-password').innerText = 'Updating...';
+    const passwordCurrent = document.querySelector('#password-current').value;
+    const password = document.querySelector('#password').value;
+    const passwordConfirm = document.querySelector('#password-confirm').value;
+
+    await updateSetting(
+      { passwordCurrent, password, passwordConfirm },
+      'password'
+    );
+
+    document.querySelector('.btn--save-password').innerText = 'Save password';
+    passwordForm.reset();
   });
 }
