@@ -31,6 +31,7 @@ module.exports = class Email {
     // 1) Render HTML từ một pug
     const html = pug.renderFile(
       `${__dirname}/../views/emails/${template}.pug`,
+      //object này sẽ trunền vào template email pug
       {
         firstName: this.firstName,
         url: this.url,
@@ -44,7 +45,7 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html)
+      text: htmlToText.htmlToText(html)
     };
 
     //3 tạo transporter và gửi email
