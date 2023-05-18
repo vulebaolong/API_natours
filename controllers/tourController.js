@@ -1,7 +1,42 @@
+const multer = require('multer');
+const sharp = require('sharp');
 const Tour = require('./../models/tourModel');
 const { catchAsync } = require('./../utils/catchAsync');
 const AppError = require('./../utils/apiError');
 const factory = require('./handleFactory');
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = function(req, file, cb) {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppError(
+        'Không phải là hình ảnh, xin vui lòng đăng tải hình ảnh',
+        400
+      ),
+      false
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 }
+]);
+// upload.single('image'); req.file
+// upload.array('images', 5); req.files
+
+exports.resizeTourImages = function(req, res, next) {
+  console.log(req.files);
+  next();
+};
 
 // tạo ra 1 middle ở giữa để thiết lập các option cho đường dẫn
 // tourController.aliasTopTour
