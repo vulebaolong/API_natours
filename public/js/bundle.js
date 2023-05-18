@@ -12160,37 +12160,31 @@ function _updateSetting() {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
-          url = '';
-          if (type === 'password') {
-            url = 'http://127.0.0.1:3000/api/v1/users/updatePassword';
-          }
-          if (type === 'data') {
-            url = 'http://127.0.0.1:3000/api/v1/users/updateMe';
-          }
-          _context.next = 6;
+          url = type === 'password' ? 'http://127.0.0.1:3000/api/v1/users/updatePassword' : 'http://127.0.0.1:3000/api/v1/users/updateMe';
+          _context.next = 4;
           return (0, _axios.default)({
             method: 'PATCH',
             url: url,
             data: data
           });
-        case 6:
+        case 4:
           result = _context.sent;
           if (result.data.status === 'success') {
             (0, _alerts.showAlert)('success', 'Đổi thông tin thành công');
           }
           console.log(result);
-          _context.next = 15;
+          _context.next = 13;
           break;
-        case 11:
-          _context.prev = 11;
+        case 9:
+          _context.prev = 9;
           _context.t0 = _context["catch"](0);
           (0, _alerts.showAlert)('error', _context.t0.response.data.message);
           console.log('👙  error: ', _context.t0);
-        case 15:
+        case 13:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[0, 11]]);
+    }, _callee, null, [[0, 9]]);
   }));
   return _updateSetting.apply(this, arguments);
 }
@@ -12363,12 +12357,11 @@ if (logOutBtn) {
 if (dataForm) {
   dataForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name = document.querySelector('#name').value;
-    var email = document.querySelector('#email').value;
-    (0, _updateSetting.updateSetting)({
-      name: name,
-      email: email
-    }, 'data');
+    var form = new FormData();
+    form.append('name', document.querySelector('#name').value);
+    form.append('email', document.querySelector('#email').value);
+    form.append('photo', document.querySelector('#photo').files[0]);
+    (0, _updateSetting.updateSetting)(form, 'data');
   });
 }
 if (passwordForm) {
@@ -12428,7 +12421,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49430" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54823" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

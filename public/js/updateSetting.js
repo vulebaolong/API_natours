@@ -4,13 +4,10 @@ import { showAlert } from './alerts';
 
 export async function updateSetting(data, type) {
   try {
-    let url = '';
-    if (type === 'password') {
-      url = 'http://127.0.0.1:3000/api/v1/users/updatePassword';
-    }
-    if (type === 'data') {
-      url = 'http://127.0.0.1:3000/api/v1/users/updateMe';
-    }
+    const url =
+      type === 'password'
+        ? 'http://127.0.0.1:3000/api/v1/users/updatePassword'
+        : 'http://127.0.0.1:3000/api/v1/users/updateMe';
     const result = await axios({
       method: 'PATCH',
       url,
