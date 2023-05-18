@@ -212,19 +212,19 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
+  // const message = `Nhấn vào đường dẫn sau để lấy lại password: ${resetURL}\n Nếu bạn không quên mật khẩu, vui lòng bỏ qua email này`;
+
   // 3) gửi lại dưới dạng email
-  const resetURL = `${req.protocal}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
-
-  const message = `Nhấn vào đường dẫn sau để lấy lại password: ${resetURL}\n Nếu bạn không quên mật khẩu, vui lòng bỏ qua email này`;
-
   try {
     // await sendEmail({
     //   email: user.email,
     //   subject: 'Thông báo đặt lại mật khẩu tồn tại trong 10 phút',
     //   message
     // });
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetPassword/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',

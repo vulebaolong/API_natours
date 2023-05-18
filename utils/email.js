@@ -56,6 +56,13 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send('welcome', 'Chào mừng đến với Natours Family');
   }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Mật khâu sẽ reset token (chỉ có hiệu lực trong 10 phút)'
+    );
+  }
 };
 
 // const sendEmail = async options => {
