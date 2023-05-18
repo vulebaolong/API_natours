@@ -33,10 +33,33 @@ exports.uploadTourImages = upload.fields([
 // upload.single('image'); req.file
 // upload.array('images', 5); req.files
 
-exports.resizeTourImages = function(req, res, next) {
+exports.resizeTourImages = catchAsync(async function(req, res, next) {
   console.log(req.files);
+
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // 1) imageCover
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 1) images
+  req.body.image = [];
+  const imagesPromise = req.files.images.map(async function(item, i) {
+    const imageFileName = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+    await sharp(item.buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${imageFileName}`);
+    req.body.image.push(imageFileName);
+  });
+  await Promise.all(imagesPromise);
   next();
-};
+});
 
 // tạo ra 1 middle ở giữa để thiết lập các option cho đường dẫn
 // tourController.aliasTopTour
