@@ -59,8 +59,8 @@ exports.getMe = (req, res, next) => {
   next();
 };
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file);
-  console.log(req.body);
+  // console.log(req.file);
+  // console.log(req.body);
 
   // 1) Tạo lỗi nếu người dùng cập nhật mật khẩu
   if (req.body.password || req.body.passwordConfirm) {
@@ -72,6 +72,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   // 2) lọc chỉ cho cập nhật name và email
   // tránh trường hợp người dùng cập nhật token
   const filteredBody = filterObj(req.body, 'name', 'email');
+  if (req.file) {
+    filteredBody.photo = req.file.filename;
+  }
 
   // 3) Update user
   // vì chỉ cập nhật dữ liệu không nhảy cảm như password nên có thể dùng findByIdAndUpdate
