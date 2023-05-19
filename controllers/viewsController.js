@@ -22,6 +22,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new AppError('Không tìm thấy tour nào', 404));
   }
+  console.log(tour);
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour
