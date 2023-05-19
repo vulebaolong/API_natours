@@ -9,12 +9,19 @@ module.exports = class Email {
     this.firstName = user.name.split(' ')[0];
     this.url = url;
     this.from = `Vũ Lê Bảo Long <${process.env.EMAIL_FORM}>`;
+    // this.from = process.env.EMAIL_FORM;
   }
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
       // Send grid
-      return 1;
+      return nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD
+        }
+      });
     }
 
     return nodemailer.createTransport({

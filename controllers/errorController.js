@@ -6,7 +6,7 @@ const handleCastErrorDB = err => {
 };
 
 const handleDuplicateFieldsDB = err => {
-  const message = `Tên '${err.keyValue.name}' đã tồn tại`;
+  const message = `Email '${err.keyValue.email}' đã tồn tại`;
   return new AppError(message, 400);
 };
 
