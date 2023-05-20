@@ -21,6 +21,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRouters');
 const bookingRouter = require('./routes/bookingRouters');
+// const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRouters');
 
 const app = express();
@@ -66,6 +67,12 @@ const limiter = rateLimit({
   message: 'Vượt quá giới hạn yêu cầu từ IP này, xin vui lòng thử lại sau 1 giờ'
 });
 app.use('/api', limiter);
+
+// app.post(
+//   '/webhook-checkout',
+//   express.raw({ type: 'application/json' }),
+//   bookingController.webhookCheckout
+// );
 
 // phân tính cú pháp body, đọc dữ liệu từ req.body
 // nếu body lớn hơn 10kb sẽ bị từ chối

@@ -54,6 +54,12 @@ exports.createBookingCheckout = catchAsync(async function(req, res, next) {
   res.redirect(req.originalUrl.split('?')[0]);
 });
 
+// exports.webhookCheckout = function(req, res, next) {
+//   const signature = req.headers['stripe-signature']
+
+//   const event = stripe.webhook.construcEvent(req.body, signature)
+// };
+
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);
 exports.getAllBooking = factory.getAll(Booking);
