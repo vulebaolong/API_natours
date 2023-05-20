@@ -12,7 +12,7 @@ const loginToken = id => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = loginToken(user._id);
   const cookieOption = {
     expires: new Date(
@@ -22,12 +22,14 @@ const createSendToken = (user, statusCode, res) => {
     // secure cookie sẽ chỉ được gửi trên một kết nối mã hóa https
     // secure: true,
     // ngăn chặn việc thay đổi cookie bởi trình duyệt, tránh tấn công trang web chéo
-    httpOnly: true
+    httpOnly: true,
+    secure: req.secure || req.headers('x-forwarded-proto') === 'https'
   };
 
   if (process.env.NODE_ENV === 'production') {
     cookieOption.secure = true;
   }
+
   res.cookie('jwt', token, cookieOption);
 
   // xóa pass word khi trả dữ liệu về cho người dùng
@@ -53,7 +55,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -77,7 +79,7 @@ exports.login = catchAsync(async (req, res, next) => {
     );
     return;
   }
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 exports.logout = function(req, res, next) {
@@ -262,7 +264,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
   // 3) cập nhật passwordChangedAt
   // 4) đăng nhập người dùng  và gửi mã JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // ĐÃ ĐĂNG NHẬP và chỉ cập nhật password
@@ -284,5 +286,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // User.findByIdAndUpdate => sẽ không làm việc
 
   // 4) đăng nhập lại người dùng và cung cấp JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
