@@ -13,6 +13,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/apiError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -30,6 +31,21 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARES
+
+// CORS
+app.use(cors());
+// Access-Control-Allow-Origin *
+
+// api.natours.com, natours.com
+// chỉ cho phép https://www.natours.com sử dụng API
+// app.use(
+//   cors({
+//     origin: 'https://www.natours.com'
+//   })
+// );
+
+app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors());
 
 // serving static file
 // app.use(express.static(`${__dirname}/public`));
@@ -95,6 +111,7 @@ app.use(compression());
 
 // 3) ROUTES
 app.use('/', viewRouter);
+// app.use('/api/v1/tours', cors(), tourRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
