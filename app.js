@@ -12,6 +12,7 @@ const xss = require('xss-clean');
 // chống lặp lại các param vì nếu trùng sẽ không chạy được
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/apiError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -82,9 +83,13 @@ app.use((req, res, next) => {
 });
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
+  // console.log(req.cookies);
   next();
 });
+
+// compression sẽ nén tất cả văn bản gửi cho khách hàng
+// chỉ làm việc cho văn bản không làm việc cho img vì jpeg đã tự nén sẵn
+app.use(compression());
 
 // 3) ROUTES
 app.use('/', viewRouter);

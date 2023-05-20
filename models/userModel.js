@@ -103,11 +103,6 @@ userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
 ) {
-  console.log(
-    '👙  candidatePassword, userPassword: ',
-    candidatePassword,
-    userPassword
-  );
   return await bscrypt.compare(candidatePassword, userPassword);
 };
 
@@ -134,7 +129,7 @@ userSchema.methods.createPasswordResetToken = function() {
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.passwordResetToken);
+  // console.log({ resetToken }, this.passwordResetToken);
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 

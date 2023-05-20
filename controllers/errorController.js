@@ -27,7 +27,6 @@ const handleJWTError = err => {
 };
 
 const handleJWTExpiredError = err => {
-  console.log(err);
   const message = `Lỗi '${err.name}': ${err.message} => token đã hết hạn`;
   return new AppError(message, 401);
 };
@@ -100,34 +99,28 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(err);
     sendErrorDev(res, req, err);
   }
 
   if (process.env.NODE_ENV === 'production') {
     // let errCoppy = JSON.parse(JSON.stringify(err));
     if (err.name === 'CastError') {
-      console.log(err.name);
       err = handleCastErrorDB(err);
     }
 
     if (err.code === 11000) {
-      console.log(err.name);
       err = handleDuplicateFieldsDB(err);
     }
 
     if (err.name === 'ValidationError') {
-      console.log(err.name);
       err = handleValidationErrorDB(err);
     }
 
     if (err.name === 'JsonWebTokenError') {
-      console.log(err.name);
       err = handleJWTError(err);
     }
 
     if (err.name === 'TokenExpiredError') {
-      console.log(err.name);
       err = handleJWTExpiredError(err);
     }
 

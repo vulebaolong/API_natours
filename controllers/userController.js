@@ -74,9 +74,6 @@ exports.getMe = (req, res, next) => {
   next();
 };
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // console.log(req.file);
-  // console.log(req.body);
-
   // 1) Tạo lỗi nếu người dùng cập nhật mật khẩu
   if (req.body.password || req.body.passwordConfirm) {
     return next(

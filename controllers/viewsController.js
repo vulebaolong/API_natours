@@ -23,7 +23,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new AppError('Không tìm thấy tour nào', 404));
   }
-  console.log(tour);
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour
@@ -43,7 +42,6 @@ exports.getAccount = (req, res) => {
 };
 
 exports.updateUserData = catchAsync(async (req, res) => {
-  console.log('ở đây', req.body);
   const user = await User.findByIdAndUpdate(
     req.user.id,
     {

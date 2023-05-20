@@ -28,7 +28,6 @@ class APIFeatures {
       // nếu price có các giá trị bằng nhau thì sẽ sắp xếp qua -ratingsQuantity là sắp xếp giảm dần
       // nếu price không có các giá trị bằng nhau thì -ratingsQuantity vô nghĩa
       const sortString = this.reqQuery.sort.split(',').join(' ');
-      console.log('👙  sortString: ', sortString);
       this.query = this.query.sort(sortString);
     } else {
       this.query = this.query.sort('-createAt');
@@ -39,7 +38,6 @@ class APIFeatures {
   fields() {
     if (this.reqQuery.fields) {
       const fieldsString = this.reqQuery.fields.split(',').join(' ');
-      console.log('👙  fieldsString: ', fieldsString);
       this.query = this.query.select(`${fieldsString}`);
     } else {
       this.query = this.query.select('-__v');
@@ -51,8 +49,6 @@ class APIFeatures {
     const page = this.reqQuery.page * 1 || 1;
     const limit = this.reqQuery.limit * 1 || 100;
     const skip = (page - 1) * limit;
-    console.log('👙  limit: ', limit);
-    console.log('👙  skip: ', skip);
     this.query = this.query.skip(skip).limit(limit);
 
     // if (this.reqQuery.page) {

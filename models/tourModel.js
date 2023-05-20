@@ -200,11 +200,10 @@ tourSchema.pre(/^find/, function(next) {
   next();
 });
 
-tourSchema.post(/^find/, function(docs, next) {
-  console.log(`time: ${Date.now() - this.start} miliseconds`);
-  console.log(docs);
-  next();
-});
+// tourSchema.post(/^find/, function(docs, next) {
+//   console.log(`time: ${Date.now() - this.start} miliseconds`);
+//   next();
+// });
 
 // TẠO BỘ KHUNG TỪ LƯỢC ĐỒ
 const Tour = mongoose.model('Tour', tourSchema);

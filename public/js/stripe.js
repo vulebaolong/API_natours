@@ -10,17 +10,14 @@ const stripe = Stripe(
 export const bookTour = async function(tourId) {
   try {
     // 1) get checkout session từ API
-    const result = await axios(
-      `http://127.0.0.1:3000/api/v1/bookings/checkout-session/${tourId}`
-    );
-    console.log(result);
+    const result = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
 
     // 2) tạo checkout form + chanre credit card
     await stripe.redirectToCheckout({
       sessionId: result.data.session.id
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     showAlert('error', error);
   }
 };
